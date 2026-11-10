@@ -1,16 +1,18 @@
-import { Slot } from "expo-router";
-import { View } from "react-native";
-import { globalStyles } from "../../style/global-styles";
+import { Slot } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
+import { globalStyles } from '@/styles/globalStyles';
 
 const RootLayout = () => {
   return (
-    <View style={globalStyles.background}>
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <SafeAreaView style={globalStyles.screen} edges={['top', 'left', 'right']}>
+        <Slot />
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
 
-      {/* Cualqueir ruta dentro de 'app/' se renderiza acá.- */}
-      <Slot></Slot>
-      
-    </View>
-  )
-}
-
-export default RootLayout
+export default RootLayout;

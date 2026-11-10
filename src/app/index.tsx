@@ -1,13 +1,7 @@
-import { View } from "react-native";
-import { globalStyles } from "../../style/global-styles";
-import { CrearPresupuesto } from "./CrearPresupuesto";
+import { CrearPresupuesto } from '@/components/CrearPresupuesto';
 
-const PrestoApp = () => {
-  return (
-    <View style={globalStyles.card}>
-      <CrearPresupuesto />
-    </View>
-  )
-}
+const HomeScreen = () => {
+  return <CrearPresupuesto />;
+};
 
-export default PrestoApp
+export default HomeScreen;
