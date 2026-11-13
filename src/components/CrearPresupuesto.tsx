@@ -2,6 +2,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
+import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
+import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
 import { useState } from 'react';
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTiempo } from './CalculoPorTiempo';
@@ -11,7 +13,21 @@ type Modo = 'horas' | 'trabajo';
 
 export const CrearPresupuesto = () => {
 
+  const [tarifa, setTarifa] = useState('');
+  const [tiempoEstimado, setTiempoEstimado] = useState('');
+  const [costosExtras, setCostosExtras] = useState('');
+
+  const [precioBase, setPrecioBase] = useState('');
+  const [complejidad, setComplejidad] = useState<Complejidad>('simple');
+  const [costosExtrasPorTiempo, setCostosExtrasPorTiempo] = useState('');
+
   const [modo, setModo] = useState<Modo>('horas');
+  
+
+  const totalHoras = calculoPorHoras(tarifa, tiempoEstimado, costosExtras);
+  const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
+
+  const total = modo === 'horas' ? totalHoras : totalTrabajo;
 
   return (
     <View style={globalStyles.screen}>
@@ -47,12 +63,31 @@ export const CrearPresupuesto = () => {
           />
 
         </View>
-        <View>
+        <ScrollView
+          automaticallyAdjustKeyboardInsets
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[globalStyles.screenContent, styles.content]}
+          showsVerticalScrollIndicator={false}
+        >
           {modo === 'horas'
-            ? <CalculoPorHoras />
-            : <CalculoPorTiempo />
+            ? <CalculoPorHoras
+              tarifa={tarifa}
+              setTarifa={setTarifa}
+              tiempoEstimado={tiempoEstimado}
+              setTiempoEstimado={setTiempoEstimado}
+              costosExtras={costosExtras}
+              setCostosExtras={setCostosExtras}
+            />
+            : <CalculoPorTiempo
+              precioBase={precioBase}
+              setPrecioBase={setPrecioBase}
+              complejidad={complejidad}
+              setComplejidad={setComplejidad}
+              costosExtrasPorTiempo={costosExtrasPorTiempo}
+              setCostosExtrasPorTiempo={setCostosExtrasPorTiempo}
+            />
           }
-        </View>
+        </ScrollView>
 
         {/* Ítems Extra.- */}
         <View style={globalStyles.section}>
@@ -75,7 +110,7 @@ export const CrearPresupuesto = () => {
         <View style={styles.totalRow}>
           <View style={styles.totalInfo}>
             <Text style={globalStyles.muted}>Total estimado</Text>
-            <Text style={styles.totalAmount}>$340</Text>
+            <Text style={styles.totalAmount}>${total},00</Text>
           </View>
           <Pressable style={globalStyles.primaryButton}>
             <Text style={globalStyles.primaryButtonText}>Generar PDF</Text>

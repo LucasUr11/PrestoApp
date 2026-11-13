@@ -1,9 +1,25 @@
 import { globalStyles } from "@/styles/globalStyles";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
 
-export const CalculoPorTiempo = () => {
+import { Complejidad } from "@/utils/calculoPorTrabajo";
+import { SegmentedControl } from "./SegmentedControl";
+
+type Props = {
+    precioBase: string;
+    setPrecioBase: (texto: string) => void;
+    complejidad: Complejidad;
+    setComplejidad: (valor: Complejidad) => void;
+    costosExtrasPorTiempo: string;
+    setCostosExtrasPorTiempo: (texto: string) => void;
+}
+
+export const CalculoPorTiempo = ({
+    precioBase, setPrecioBase,
+    complejidad, setComplejidad,
+    costosExtrasPorTiempo, setCostosExtrasPorTiempo
+}: Props )=> {
     return (
         <View style={globalStyles.section}>
             <Text style={globalStyles.sectionTitle}>Cálculo por tipo de trabajo</Text>
@@ -16,25 +32,37 @@ export const CalculoPorTiempo = () => {
             </View>
 
             <View style={styles.field}>
-                <Text style={globalStyles.label}>Tarifa base</Text>
-                <View style={globalStyles.inputField}>
-                    <Text style={globalStyles.body}>$25</Text>
-                </View>
+                <Text style={globalStyles.label}>Precio base</Text>
+                <TextInput
+                    value={precioBase}
+                    onChangeText={setPrecioBase}
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                    style={globalStyles.inputField}
+                />
             </View>
 
-            <View style={styles.tabBar}>
-                <Pressable style={styles.tabItem} hitSlop={8}>
-                    <Text style={styles.tabIconActive}>○</Text>
-                    <Text style={styles.tabLabelActive}>Simple</Text>
-                </Pressable>
-                <Pressable style={styles.tabItem} hitSlop={8}>
-                    <Text style={styles.tabIcon}>○</Text>
-                    <Text style={styles.tabLabel}>Media</Text>
-                </Pressable>
-                <Pressable style={styles.tabItem} hitSlop={8}>
-                    <Text style={styles.tabIcon}>○</Text>
-                    <Text style={styles.tabLabel}>Compleja</Text>
-                </Pressable>
+            <View style={globalStyles.inputField}>
+                <SegmentedControl
+                    options={[
+                        { value: 'simple', label: 'Simple' },
+                        { value: 'media', label: 'Media' },
+                        { value: 'compleja', label: 'Complejo' }
+                    ]}
+                    value={complejidad}
+                    onChange={setComplejidad}
+                />
+            </View>
+
+            <View style={styles.field}>
+                <Text style={globalStyles.label}>Materiales y costos extra</Text>
+                <TextInput
+                    value={costosExtrasPorTiempo}
+                    onChangeText={setCostosExtrasPorTiempo}
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                    style={globalStyles.inputField}
+                />
             </View>
         </View>
     )

@@ -1,35 +1,58 @@
 import { globalStyles } from "@/styles/globalStyles";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Spacing } from "@/constants/theme";
 
-export const CalculoPorHoras = () => {
+type Props = {
+    tarifa: string;
+    setTarifa: (texto: string) => void;
+    tiempoEstimado: string;
+    setTiempoEstimado: (texto: string) => void;
+    costosExtras: string;
+    setCostosExtras: (texto: string) => void;
+}
+
+export const CalculoPorHoras = ({
+    tarifa, setTarifa,
+    tiempoEstimado, setTiempoEstimado,
+    costosExtras, setCostosExtras
+}: Props) => {
+
     return (
         <View style={globalStyles.section}>
             <Text style={globalStyles.sectionTitle}>Cálculo por horas</Text>
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Tarifa por hora</Text>
-                <View style={globalStyles.inputField}>
-                    <Text style={globalStyles.body}>$25</Text>
-                    <Text style={globalStyles.muted}>por hora</Text>
-                </View>
+                <TextInput 
+                    value={tarifa}
+                    onChangeText={setTarifa}
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                    style={globalStyles.inputField}
+                />
             </View>
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Tiempo estimado</Text>
-                <View style={globalStyles.inputField}>
-                    <Text style={globalStyles.body}>12</Text>
-                    <Text style={globalStyles.muted}>horas</Text>
-                </View>
+                <TextInput 
+                    value={tiempoEstimado}
+                    onChangeText={setTiempoEstimado}
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                    style={globalStyles.inputField}
+                />
             </View>
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Materiales y costos extra</Text>
-                <View style={globalStyles.inputField}>
-                    <Text style={globalStyles.body}>$40</Text>
-                    <Text style={globalStyles.muted}>total</Text>
-                </View>
+                <TextInput 
+                    value={costosExtras}
+                    onChangeText={setCostosExtras}
+                    keyboardType="decimal-pad"
+                    placeholder="0"
+                    style={globalStyles.inputField}
+                />
             </View>
         </View>
     )
