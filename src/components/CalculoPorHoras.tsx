@@ -1,7 +1,7 @@
 import { globalStyles } from "@/styles/globalStyles";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Spacing } from "@/constants/theme";
+import { Colors, Spacing } from "@/constants/theme";
 
 type Props = {
     tarifa: string;
@@ -29,6 +29,7 @@ export const CalculoPorHoras = ({
                     onChangeText={setTarifa}
                     keyboardType="decimal-pad"
                     placeholder="0"
+                    placeholderTextColor={Colors.placeholder}
                     style={globalStyles.inputField}
                 />
             </View>
@@ -40,6 +41,7 @@ export const CalculoPorHoras = ({
                     onChangeText={setTiempoEstimado}
                     keyboardType="decimal-pad"
                     placeholder="0"
+                    placeholderTextColor={Colors.placeholder}
                     style={globalStyles.inputField}
                 />
             </View>
@@ -51,6 +53,7 @@ export const CalculoPorHoras = ({
                     onChangeText={setCostosExtras}
                     keyboardType="decimal-pad"
                     placeholder="0"
+                    placeholderTextColor={Colors.placeholder}
                     style={globalStyles.inputField}
                 />
             </View>

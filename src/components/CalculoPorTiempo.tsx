@@ -38,6 +38,7 @@ export const CalculoPorTiempo = ({
                     onChangeText={setPrecioBase}
                     keyboardType="decimal-pad"
                     placeholder="0"
+                    placeholderTextColor={Colors.placeholder}
                     style={globalStyles.inputField}
                 />
             </View>
@@ -61,6 +62,7 @@ export const CalculoPorTiempo = ({
                     onChangeText={setCostosExtrasPorTiempo}
                     keyboardType="decimal-pad"
                     placeholder="0"
+                    placeholderTextColor={Colors.placeholder}
                     style={globalStyles.inputField}
                 />
             </View>

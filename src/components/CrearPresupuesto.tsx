@@ -1,11 +1,14 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
+
 import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
-import { useState } from 'react';
+
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTiempo } from './CalculoPorTiempo';
 import { SegmentedControl } from './SegmentedControl';
@@ -14,27 +17,35 @@ type Modo = 'horas' | 'trabajo';
 
 export const CrearPresupuesto = () => {
 
+  // Cálculos de 'HORAS'.-
   const [tarifa, setTarifa] = useState('');
   const [tiempoEstimado, setTiempoEstimado] = useState('');
   const [costosExtras, setCostosExtras] = useState('');
 
+  // Cálculos de 'TRABAJO'.-
   const [precioBase, setPrecioBase] = useState('');
   const [complejidad, setComplejidad] = useState<Complejidad>('simple');
   const [costosExtrasPorTiempo, setCostosExtrasPorTiempo] = useState('');
 
+  // Estado para guardar las notas privadas.-
+  const [notaPrivada, setNotaPrivada] = useState('');
+
+  // Elige el modo (HORAS / TRABAJO).-
   const [modo, setModo] = useState<Modo>('horas');
-  
 
   const totalHoras = calculoPorHoras(tarifa, tiempoEstimado, costosExtras);
   const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
 
   const total = modo === 'horas' ? totalHoras : totalTrabajo;
 
+  // Convierte a 'String' y a moneda local el precio total.-
   const aString: string = convertirAString(total);
 
   return (
     <View style={globalStyles.screen}>
       <ScrollView
+        automaticallyAdjustKeyboardInsets
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={[globalStyles.screenContent, styles.content]}
         showsVerticalScrollIndicator={false}
       >
@@ -55,6 +66,7 @@ export const CrearPresupuesto = () => {
           </Pressable>
         </View>
 
+        {/* Cálculos.- */}
         <View style={globalStyles.inputField}>
           <SegmentedControl
             options={[
@@ -66,12 +78,7 @@ export const CrearPresupuesto = () => {
           />
 
         </View>
-        <ScrollView
-          automaticallyAdjustKeyboardInsets
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[globalStyles.screenContent, styles.content]}
-          showsVerticalScrollIndicator={false}
-        >
+        <View>
           {modo === 'horas'
             ? <CalculoPorHoras
               tarifa={tarifa}
@@ -90,7 +97,23 @@ export const CrearPresupuesto = () => {
               setCostosExtrasPorTiempo={setCostosExtrasPorTiempo}
             />
           }
-        </ScrollView>
+        </View>
+
+        {/* Notas Privadas.- */}
+        <View style={globalStyles.section}>
+          <Text style={globalStyles.sectionTitle}>Notas Privadas</Text>
+          <View style={styles.field}>
+            <Text style={globalStyles.label}>Agregá notas personales de cada cliente</Text>
+            <TextInput
+              value={notaPrivada}
+              onChangeText={setNotaPrivada}
+              placeholder="No irá en el presupuesto"
+              style={[globalStyles.inputField, styles.textInputMultiline]}
+              multiline={true}
+              placeholderTextColor={Colors.placeholder}
+            />
+          </View>
+        </View>
 
         {/* Ítems Extra.- */}
         <View style={globalStyles.section}>
@@ -110,6 +133,7 @@ export const CrearPresupuesto = () => {
           </View>
         </View>
 
+        {/* Total + Botón de Generar PDF.- */}
         <View style={styles.totalRow}>
           <View style={styles.totalInfo}>
             <Text style={globalStyles.muted}>Total estimado</Text>
@@ -201,5 +225,11 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
+  },
+  textInputMultiline: {
+    minHeight: "100"
+  },
+  field: {
+    gap: Spacing.sm,
   },
 });
