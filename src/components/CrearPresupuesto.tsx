@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
 import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
+import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
 import { useState } from 'react';
 import { CalculoPorHoras } from './CalculoPorHoras';
@@ -28,6 +29,8 @@ export const CrearPresupuesto = () => {
   const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
 
   const total = modo === 'horas' ? totalHoras : totalTrabajo;
+
+  const aString: string = convertirAString(total);
 
   return (
     <View style={globalStyles.screen}>
@@ -110,7 +113,7 @@ export const CrearPresupuesto = () => {
         <View style={styles.totalRow}>
           <View style={styles.totalInfo}>
             <Text style={globalStyles.muted}>Total estimado</Text>
-            <Text style={styles.totalAmount}>${total},00</Text>
+            <Text style={styles.totalAmount}>{aString}</Text>
           </View>
           <Pressable style={globalStyles.primaryButton}>
             <Text style={globalStyles.primaryButtonText}>Generar PDF</Text>
