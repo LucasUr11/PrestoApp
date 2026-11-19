@@ -1,19 +1,26 @@
 import { useState } from 'react';
-
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
 
+import { calculoItemsExtra, ItemExtra } from '@/utils/calculoItemsExtra';
 import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
-
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTiempo } from './CalculoPorTiempo';
 import { SegmentedControl } from './SegmentedControl';
 
+import { ItemsExtra } from './ItemsExtra';
+
+
 type Modo = 'horas' | 'trabajo';
+
+const ITEMS_INICIALES: ItemExtra[] = [
+  {id: '1', nombre:'Revisiones', valor: '', activo: false, personalizado: false},
+  {id: '2', nombre:'Urgencia', valor: '', activo: false, personalizado: false},
+];
 
 export const CrearPresupuesto = () => {
 
@@ -30,13 +37,16 @@ export const CrearPresupuesto = () => {
   // Estado para guardar las notas privadas.-
   const [notaPrivada, setNotaPrivada] = useState('');
 
+  // Estado para ItemsExtra.-
+  const [items, setItems] = useState<ItemExtra[]>(ITEMS_INICIALES);
+
   // Elige el modo (HORAS / TRABAJO).-
   const [modo, setModo] = useState<Modo>('horas');
 
   const totalHoras = calculoPorHoras(tarifa, tiempoEstimado, costosExtras);
   const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
 
-  const total = modo === 'horas' ? totalHoras : totalTrabajo;
+  const total = (modo === 'horas' ? totalHoras : totalTrabajo) + calculoItemsExtra(items);
 
   // Convierte a 'String' y a moneda local el precio total.-
   const aString: string = convertirAString(total);
@@ -116,22 +126,10 @@ export const CrearPresupuesto = () => {
         </View>
 
         {/* Ítems Extra.- */}
-        <View style={globalStyles.section}>
-          <Text style={globalStyles.sectionTitle}>Ítems extra</Text>
-          <View style={styles.chipRow}>
-            <Pressable style={[globalStyles.pillButton, globalStyles.pillButtonActive]}>
-              <Text style={[globalStyles.pillButtonText, globalStyles.pillButtonTextActive]}>
-                Revisiones
-              </Text>
-            </Pressable>
-            <Pressable style={globalStyles.pillButton}>
-              <Text style={globalStyles.pillButtonText}>Urgencia</Text>
-            </Pressable>
-            <Pressable style={globalStyles.pillButton}>
-              <Text style={globalStyles.pillButtonText}>+ Agregar</Text>
-            </Pressable>
-          </View>
-        </View>
+        <ItemsExtra 
+          items={items}
+          setItems={setItems}
+        />
 
         {/* Total + Botón de Generar PDF.- */}
         <View style={styles.totalRow}>
@@ -170,11 +168,6 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: Spacing.xs,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
   },
   totalRow: {
     flexDirection: 'row',
@@ -227,7 +220,7 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   textInputMultiline: {
-    minHeight: "100"
+    minHeight: 100
   },
   field: {
     gap: Spacing.sm,
