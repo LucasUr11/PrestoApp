@@ -1,28 +1,43 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
 
+import { useClientes } from '@/context/ClientesContext';
 import { calculoItemsExtra, ItemExtra } from '@/utils/calculoItemsExtra';
 import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
+import { agregarCliente, crearCliente, DatosCliente } from '@/utils/clientes';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTiempo } from './CalculoPorTiempo';
-import { SegmentedControl } from './SegmentedControl';
-
+import { FormularioCliente } from './FormularioCliente';
 import { ItemsExtra } from './ItemsExtra';
-
+import { SegmentedControl } from './SegmentedControl';
 
 type Modo = 'horas' | 'trabajo';
 
 const ITEMS_INICIALES: ItemExtra[] = [
-  {id: '1', nombre:'Revisiones', valor: '', activo: false, personalizado: false},
-  {id: '2', nombre:'Urgencia', valor: '', activo: false, personalizado: false},
+  { id: '1', nombre: 'Revisiones', valor: '', activo: false, personalizado: false },
+  { id: '2', nombre: 'Urgencia', valor: '', activo: false, personalizado: false },
 ];
 
 export const CrearPresupuesto = () => {
+
+  // Estados para el formulario.-
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [clienteId, setClienteId] = useState<string | null>(null);
+  const { clientes, setClientes } = useClientes();
+
+  const guardarCliente = (datos: DatosCliente) => {
+    const nuevo = crearCliente(datos);
+    setClientes((actuales) => agregarCliente(actuales, nuevo));
+    setClienteId(nuevo.id);
+    setMostrarFormulario(false);
+  }
+
+  const clienteElegido = clientes.find((c) => c.id === clienteId);
 
   // Cálculos de 'HORAS'.-
   const [tarifa, setTarifa] = useState('');
@@ -34,18 +49,17 @@ export const CrearPresupuesto = () => {
   const [complejidad, setComplejidad] = useState<Complejidad>('simple');
   const [costosExtrasPorTiempo, setCostosExtrasPorTiempo] = useState('');
 
+  // Elige el modo (HORAS / TRABAJO).-
+  const [modo, setModo] = useState<Modo>('horas');
+
   // Estado para guardar las notas privadas.-
   const [notaPrivada, setNotaPrivada] = useState('');
 
   // Estado para ItemsExtra.-
   const [items, setItems] = useState<ItemExtra[]>(ITEMS_INICIALES);
 
-  // Elige el modo (HORAS / TRABAJO).-
-  const [modo, setModo] = useState<Modo>('horas');
-
   const totalHoras = calculoPorHoras(tarifa, tiempoEstimado, costosExtras);
   const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
-
   const total = (modo === 'horas' ? totalHoras : totalTrabajo) + calculoItemsExtra(items);
 
   // Convierte a 'String' y a moneda local el precio total.-
@@ -68,10 +82,14 @@ export const CrearPresupuesto = () => {
         <View style={globalStyles.card}>
           <Text style={globalStyles.label}>Cliente</Text>
           <View style={globalStyles.inputField}>
-            <Text style={globalStyles.body}>Elegir cliente del historial</Text>
-            <Text style={globalStyles.muted}>▼</Text>
+            <Text style={globalStyles.body}>
+              {clienteElegido ? clienteElegido.nombreApellido : 'Elegir el cliente del historial'}
+            </Text>
           </View>
-          <Pressable hitSlop={8}>
+          <Pressable
+            onPress={() => setMostrarFormulario(true)}
+            hitSlop={8}
+          >
             <Text style={globalStyles.linkButtonText}>+ Crear cliente nuevo</Text>
           </Pressable>
         </View>
@@ -113,7 +131,6 @@ export const CrearPresupuesto = () => {
         <View style={globalStyles.section}>
           <Text style={globalStyles.sectionTitle}>Notas Privadas</Text>
           <View style={styles.field}>
-            <Text style={globalStyles.label}>Agregá notas personales de cada cliente</Text>
             <TextInput
               value={notaPrivada}
               onChangeText={setNotaPrivada}
@@ -126,7 +143,7 @@ export const CrearPresupuesto = () => {
         </View>
 
         {/* Ítems Extra.- */}
-        <ItemsExtra 
+        <ItemsExtra
           items={items}
           setItems={setItems}
         />
@@ -157,6 +174,18 @@ export const CrearPresupuesto = () => {
           <Text style={styles.tabLabel}>Perfil</Text>
         </Pressable>
       </View>
+
+      <Modal
+        visible={mostrarFormulario}
+        animationType='slide'
+        presentationStyle='pageSheet'
+        onRequestClose={() => setMostrarFormulario(false)}
+      >
+        <FormularioCliente
+          onGuardar={guardarCliente}
+          onCancelar={() => setMostrarFormulario(false)}
+        />
+      </Modal>
     </View>
   );
 };
