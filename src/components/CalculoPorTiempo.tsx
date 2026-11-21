@@ -3,22 +3,18 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
 
-import { Complejidad } from "@/utils/calculoPorTrabajo";
+import { Complejidad, DatosPorTrabajo } from "@/utils/calculoPorTrabajo";
 import { SegmentedControl } from "./SegmentedControl";
 
+
 type Props = {
-    precioBase: string;
-    setPrecioBase: (texto: string) => void;
-    complejidad: Complejidad;
-    setComplejidad: (valor: Complejidad) => void;
-    costosExtrasPorTiempo: string;
-    setCostosExtrasPorTiempo: (texto: string) => void;
+    datos: DatosPorTrabajo,
+    cambiarCampos: (campo: Exclude<keyof DatosPorTrabajo, 'complejidad'>, texto: string) => void,
+    cambiarComplejidad: (campo: Complejidad) => void,
 }
 
 export const CalculoPorTiempo = ({
-    precioBase, setPrecioBase,
-    complejidad, setComplejidad,
-    costosExtrasPorTiempo, setCostosExtrasPorTiempo
+    datos, cambiarCampos, cambiarComplejidad
 }: Props )=> {
     return (
         <View style={globalStyles.section}>
@@ -34,8 +30,8 @@ export const CalculoPorTiempo = ({
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Precio base</Text>
                 <TextInput
-                    value={precioBase}
-                    onChangeText={setPrecioBase}
+                    value={datos.precioBase}
+                    onChangeText={(t) => cambiarCampos('precioBase', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}
@@ -50,16 +46,16 @@ export const CalculoPorTiempo = ({
                         { value: 'media', label: 'Media' },
                         { value: 'compleja', label: 'Complejo' }
                     ]}
-                    value={complejidad}
-                    onChange={setComplejidad}
+                    value={datos.complejidad}
+                    onChange={cambiarComplejidad}
                 />
             </View>
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Materiales y costos extra</Text>
                 <TextInput
-                    value={costosExtrasPorTiempo}
-                    onChangeText={setCostosExtrasPorTiempo}
+                    value={datos.costosExtrasPorTiempo}
+                    onChangeText={(t) => cambiarCampos('costosExtrasPorTiempo', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}

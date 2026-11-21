@@ -6,10 +6,10 @@ import { globalStyles } from '@/styles/globalStyles';
 
 import { useClientes } from '@/context/ClientesContext';
 import { calculoItemsExtra, ItemExtra } from '@/utils/calculoItemsExtra';
-import { calculoPorTrabajo, Complejidad } from '@/utils/calculoPorTrabajo';
+import { calculoPorTrabajo, Complejidad, DatosPorTrabajo } from '@/utils/calculoPorTrabajo';
 import { agregarCliente, crearCliente, DatosCliente } from '@/utils/clientes';
 import { convertirAString } from '@/utils/convertirAString';
-import { calculoPorHoras } from '@/utils/FuncionesPorHoras';
+import { calculoPorHoras, DatosHoras } from '@/utils/FuncionesPorHoras';
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTiempo } from './CalculoPorTiempo';
 import { FormularioCliente } from './FormularioCliente';
@@ -22,6 +22,16 @@ const ITEMS_INICIALES: ItemExtra[] = [
   { id: '1', nombre: 'Revisiones', valor: '', activo: false, personalizado: false },
   { id: '2', nombre: 'Urgencia', valor: '', activo: false, personalizado: false },
 ];
+
+// Eliminamos los 'useState' para un mejor órden.-
+const DATOS_HORAS_VACIO: DatosHoras = {
+  tarifa: '', tiempoEstimado: '', costosExtras: ''
+}
+
+const DATOS_POR_TRABAJO_VACIOS: DatosPorTrabajo = {
+  precioBase: '', complejidad: 'simple', costosExtrasPorTiempo: '',
+}
+
 
 export const CrearPresupuesto = () => {
 
@@ -40,14 +50,22 @@ export const CrearPresupuesto = () => {
   const clienteElegido = clientes.find((c) => c.id === clienteId);
 
   // Cálculos de 'HORAS'.-
-  const [tarifa, setTarifa] = useState('');
-  const [tiempoEstimado, setTiempoEstimado] = useState('');
-  const [costosExtras, setCostosExtras] = useState('');
+  const [datosHoras, setDatosHoras] = useState<DatosHoras>(DATOS_HORAS_VACIO);
+
+  const cambiarCamposHoras = (campo: keyof DatosHoras, texto: string) => {
+    setDatosHoras((actuales) => ({ ...actuales, [campo]: texto }));
+  };
 
   // Cálculos de 'TRABAJO'.-
-  const [precioBase, setPrecioBase] = useState('');
-  const [complejidad, setComplejidad] = useState<Complejidad>('simple');
-  const [costosExtrasPorTiempo, setCostosExtrasPorTiempo] = useState('');
+  const [datosPorTrabajo, setDatosPorTrabajo] = useState<DatosPorTrabajo>(DATOS_POR_TRABAJO_VACIOS);
+
+  const cambiarCamposPorTrabajo = (campo: Exclude<keyof DatosPorTrabajo, 'complejidad'>, texto: string) => {
+    setDatosPorTrabajo((actuales) => ({ ...actuales, [campo]: texto }));
+  };
+
+  const cambiarComplejidad = (campo: Complejidad) => {
+    setDatosPorTrabajo((actuales) => ({ ...actuales,  campo}));
+  };
 
   // Elige el modo (HORAS / TRABAJO).-
   const [modo, setModo] = useState<Modo>('horas');
@@ -58,8 +76,8 @@ export const CrearPresupuesto = () => {
   // Estado para ItemsExtra.-
   const [items, setItems] = useState<ItemExtra[]>(ITEMS_INICIALES);
 
-  const totalHoras = calculoPorHoras(tarifa, tiempoEstimado, costosExtras);
-  const totalTrabajo = calculoPorTrabajo(precioBase, complejidad, costosExtrasPorTiempo);
+  const totalHoras = calculoPorHoras(datosHoras.tarifa, datosHoras.tiempoEstimado, datosHoras.costosExtras);
+  const totalTrabajo = calculoPorTrabajo(datosPorTrabajo.precioBase, datosPorTrabajo.complejidad, datosPorTrabajo.costosExtrasPorTiempo);
   const total = (modo === 'horas' ? totalHoras : totalTrabajo) + calculoItemsExtra(items);
 
   // Convierte a 'String' y a moneda local el precio total.-
@@ -109,20 +127,13 @@ export const CrearPresupuesto = () => {
         <View>
           {modo === 'horas'
             ? <CalculoPorHoras
-              tarifa={tarifa}
-              setTarifa={setTarifa}
-              tiempoEstimado={tiempoEstimado}
-              setTiempoEstimado={setTiempoEstimado}
-              costosExtras={costosExtras}
-              setCostosExtras={setCostosExtras}
+              datos={datosHoras}
+              cambiarCampos={cambiarCamposHoras}
             />
             : <CalculoPorTiempo
-              precioBase={precioBase}
-              setPrecioBase={setPrecioBase}
-              complejidad={complejidad}
-              setComplejidad={setComplejidad}
-              costosExtrasPorTiempo={costosExtrasPorTiempo}
-              setCostosExtrasPorTiempo={setCostosExtrasPorTiempo}
+              datos={datosPorTrabajo}
+              cambiarCampos={cambiarCamposPorTrabajo}
+              cambiarComplejidad={cambiarComplejidad}
             />
           }
         </View>

@@ -2,20 +2,15 @@ import { globalStyles } from "@/styles/globalStyles";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Colors, Spacing } from "@/constants/theme";
+import { DatosHoras } from "@/utils/FuncionesPorHoras";
 
 type Props = {
-    tarifa: string;
-    setTarifa: (texto: string) => void;
-    tiempoEstimado: string;
-    setTiempoEstimado: (texto: string) => void;
-    costosExtras: string;
-    setCostosExtras: (texto: string) => void;
+    datos: DatosHoras,
+    cambiarCampos: (campo: keyof DatosHoras, texto: string) => void,
 }
 
 export const CalculoPorHoras = ({
-    tarifa, setTarifa,
-    tiempoEstimado, setTiempoEstimado,
-    costosExtras, setCostosExtras
+    datos, cambiarCampos
 }: Props) => {
 
     return (
@@ -24,9 +19,9 @@ export const CalculoPorHoras = ({
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Tarifa por hora</Text>
-                <TextInput 
-                    value={tarifa}
-                    onChangeText={setTarifa}
+                <TextInput
+                    value={datos.tarifa}
+                    onChangeText={(t) => cambiarCampos('tarifa', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}
@@ -36,9 +31,9 @@ export const CalculoPorHoras = ({
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Tiempo estimado</Text>
-                <TextInput 
-                    value={tiempoEstimado}
-                    onChangeText={setTiempoEstimado}
+                <TextInput
+                    value={datos.tiempoEstimado}
+                    onChangeText={(t) => cambiarCampos('tiempoEstimado', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}
@@ -48,9 +43,9 @@ export const CalculoPorHoras = ({
 
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Materiales y costos extra</Text>
-                <TextInput 
-                    value={costosExtras}
-                    onChangeText={setCostosExtras}
+                <TextInput
+                    value={datos.costosExtras}
+                    onChangeText={(t) => cambiarCampos('costosExtras', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}

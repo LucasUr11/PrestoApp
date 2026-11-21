@@ -8,6 +8,12 @@ const multiplicadores: Record<Complejidad, number> = {
     compleja: 2
 }
 
+export type DatosPorTrabajo = {
+    precioBase: string,
+    complejidad: Complejidad,
+    costosExtrasPorTiempo: string,
+}
+
 export const calculoPorTrabajo = (
     precioBase: string,
     complejidad: Complejidad,
