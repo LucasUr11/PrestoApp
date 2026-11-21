@@ -11,7 +11,7 @@ const multiplicadores: Record<Complejidad, number> = {
 export type DatosPorTrabajo = {
     precioBase: string,
     complejidad: Complejidad,
-    costosExtrasPorTiempo: string,
+    costosExtras: string,
 }
 
 export const calculoPorTrabajo = (
@@ -22,3 +22,4 @@ export const calculoPorTrabajo = (
     return aNumero(precioBase) * multiplicadores[complejidad] + aNumero(costosExtras);
 };
 
+export type CampoTexto = Exclude<keyof DatosPorTrabajo, 'complejidad'>

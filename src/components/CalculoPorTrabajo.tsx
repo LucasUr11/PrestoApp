@@ -1,19 +1,18 @@
 import { globalStyles } from "@/styles/globalStyles";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { Colors, Spacing } from "@/constants/theme";
 
-import { Complejidad, DatosPorTrabajo } from "@/utils/calculoPorTrabajo";
+import { CampoTexto, Complejidad, DatosPorTrabajo } from "@/utils/calculoPorTrabajo";
 import { SegmentedControl } from "./SegmentedControl";
-
 
 type Props = {
     datos: DatosPorTrabajo,
-    cambiarCampos: (campo: Exclude<keyof DatosPorTrabajo, 'complejidad'>, texto: string) => void,
-    cambiarComplejidad: (campo: Complejidad) => void,
+    cambiarCampos: (campo: CampoTexto, texto: string) => void,
+    cambiarComplejidad: (nuevaComplejidad: Complejidad) => void,
 }
 
-export const CalculoPorTiempo = ({
+export const CalculoPorTrabajo = ({
     datos, cambiarCampos, cambiarComplejidad
 }: Props )=> {
     return (
@@ -44,7 +43,7 @@ export const CalculoPorTiempo = ({
                     options={[
                         { value: 'simple', label: 'Simple' },
                         { value: 'media', label: 'Media' },
-                        { value: 'compleja', label: 'Complejo' }
+                        { value: 'compleja', label: 'Compleja' }
                     ]}
                     value={datos.complejidad}
                     onChange={cambiarComplejidad}
@@ -54,8 +53,8 @@ export const CalculoPorTiempo = ({
             <View style={styles.field}>
                 <Text style={globalStyles.label}>Materiales y costos extra</Text>
                 <TextInput
-                    value={datos.costosExtrasPorTiempo}
-                    onChangeText={(t) => cambiarCampos('costosExtrasPorTiempo', t)}
+                    value={datos.costosExtras}
+                    onChangeText={(t) => cambiarCampos('costosExtras', t)}
                     keyboardType="decimal-pad"
                     placeholder="0"
                     placeholderTextColor={Colors.placeholder}
@@ -69,39 +68,5 @@ export const CalculoPorTiempo = ({
 const styles = StyleSheet.create({
     field: {
         gap: Spacing.sm,
-    },
-    tabBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: Colors.border,
-        backgroundColor: Colors.surface,
-        paddingHorizontal: Spacing.lg,
-        paddingTop: Spacing.sm,
-        paddingBottom: Spacing.lg,
-    },
-    tabItem: {
-        alignItems: 'center',
-        gap: Spacing.xs,
-        minWidth: 72,
-    },
-    tabIcon: {
-        fontSize: FontSize.xl,
-        color: Colors.textMuted,
-    },
-    tabIconActive: {
-        fontSize: FontSize.xl,
-        color: Colors.primary,
-    },
-    tabLabel: {
-        fontSize: FontSize.xs,
-        fontWeight: FontWeight.medium,
-        color: Colors.textMuted,
-    },
-    tabLabelActive: {
-        fontSize: FontSize.xs,
-        fontWeight: FontWeight.semibold,
-        color: Colors.primary,
     },
 })

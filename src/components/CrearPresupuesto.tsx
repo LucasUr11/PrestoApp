@@ -6,12 +6,12 @@ import { globalStyles } from '@/styles/globalStyles';
 
 import { useClientes } from '@/context/ClientesContext';
 import { calculoItemsExtra, ItemExtra } from '@/utils/calculoItemsExtra';
-import { calculoPorTrabajo, Complejidad, DatosPorTrabajo } from '@/utils/calculoPorTrabajo';
+import { calculoPorTrabajo, CampoTexto, Complejidad, DatosPorTrabajo } from '@/utils/calculoPorTrabajo';
 import { agregarCliente, crearCliente, DatosCliente } from '@/utils/clientes';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras, DatosHoras } from '@/utils/FuncionesPorHoras';
 import { CalculoPorHoras } from './CalculoPorHoras';
-import { CalculoPorTiempo } from './CalculoPorTiempo';
+import { CalculoPorTrabajo } from './CalculoPorTrabajo';
 import { FormularioCliente } from './FormularioCliente';
 import { ItemsExtra } from './ItemsExtra';
 import { SegmentedControl } from './SegmentedControl';
@@ -23,61 +23,77 @@ const ITEMS_INICIALES: ItemExtra[] = [
   { id: '2', nombre: 'Urgencia', valor: '', activo: false, personalizado: false },
 ];
 
-// Eliminamos los 'useState' para un mejor órden.-
+// Valores iniciales de cada formulario.-
 const DATOS_HORAS_VACIO: DatosHoras = {
   tarifa: '', tiempoEstimado: '', costosExtras: ''
 }
 
 const DATOS_POR_TRABAJO_VACIOS: DatosPorTrabajo = {
-  precioBase: '', complejidad: 'simple', costosExtrasPorTiempo: '',
+  precioBase: '', complejidad: 'simple', costosExtras: '',
 }
 
 
 export const CrearPresupuesto = () => {
 
-  // Estados para el formulario.-
+  /* 
+      ///////////////// ESTADOS /////////////////
+  */
+  
+  // Estado para el Formulario.-
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  
+  // Estados para cambiar los Clientes.-
   const [clienteId, setClienteId] = useState<string | null>(null);
   const { clientes, setClientes } = useClientes();
 
-  const guardarCliente = (datos: DatosCliente) => {
-    const nuevo = crearCliente(datos);
-    setClientes((actuales) => agregarCliente(actuales, nuevo));
-    setClienteId(nuevo.id);
-    setMostrarFormulario(false);
-  }
-
-  const clienteElegido = clientes.find((c) => c.id === clienteId);
-
-  // Cálculos de 'HORAS'.-
+  // Estados para calcular el precio por hora.-
   const [datosHoras, setDatosHoras] = useState<DatosHoras>(DATOS_HORAS_VACIO);
 
-  const cambiarCamposHoras = (campo: keyof DatosHoras, texto: string) => {
-    setDatosHoras((actuales) => ({ ...actuales, [campo]: texto }));
-  };
-
-  // Cálculos de 'TRABAJO'.-
+  // Estados para calcular el precio por tipo de trabajo.-
   const [datosPorTrabajo, setDatosPorTrabajo] = useState<DatosPorTrabajo>(DATOS_POR_TRABAJO_VACIOS);
-
-  const cambiarCamposPorTrabajo = (campo: Exclude<keyof DatosPorTrabajo, 'complejidad'>, texto: string) => {
-    setDatosPorTrabajo((actuales) => ({ ...actuales, [campo]: texto }));
-  };
-
-  const cambiarComplejidad = (campo: Complejidad) => {
-    setDatosPorTrabajo((actuales) => ({ ...actuales,  campo}));
-  };
-
-  // Elige el modo (HORAS / TRABAJO).-
+  
+  // Estado para que elegir el Modo (horas / trabajo).-
   const [modo, setModo] = useState<Modo>('horas');
 
-  // Estado para guardar las notas privadas.-
+  // Estados para la Nota Privada.-
   const [notaPrivada, setNotaPrivada] = useState('');
 
   // Estado para ItemsExtra.-
   const [items, setItems] = useState<ItemExtra[]>(ITEMS_INICIALES);
 
+  /* 
+      ///////////////// FUNCIONES /////////////////
+  */
+
+  // Función para Guardar al Cliente.-
+  const guardarCliente = (datos: DatosCliente) => {
+    const nuevo = crearCliente(datos);
+    setClientes((actuales) => agregarCliente(actuales, nuevo));
+    setClienteId(nuevo.id);
+    setMostrarFormulario(false);
+  };
+
+  // Toma el cliente elegido y lo muestrá en la pantalla.-
+  const clienteElegido = clientes.find((c) => c.id === clienteId);
+
+  // Función para calcular por hora.-
+  const cambiarCamposHoras = (campo: keyof DatosHoras, texto: string) => {
+    setDatosHoras((actuales) => ({ ...actuales, [campo]: texto }));
+  };
+
+  // Función para calcular por tipo de trabajo.-
+  const cambiarCamposPorTrabajo = (campo: CampoTexto, texto: string) => {
+    setDatosPorTrabajo((actuales) => ({ ...actuales, [campo]: texto }));
+  };
+
+  // Función para cambiar la complejidad.-
+  const cambiarComplejidad = (nuevaComplejidad: Complejidad) => {
+    setDatosPorTrabajo((actuales) => ({ ...actuales, complejidad: nuevaComplejidad }));
+  };
+  
+  // Funciones para calcular el total del presupuesto.-
   const totalHoras = calculoPorHoras(datosHoras.tarifa, datosHoras.tiempoEstimado, datosHoras.costosExtras);
-  const totalTrabajo = calculoPorTrabajo(datosPorTrabajo.precioBase, datosPorTrabajo.complejidad, datosPorTrabajo.costosExtrasPorTiempo);
+  const totalTrabajo = calculoPorTrabajo(datosPorTrabajo.precioBase, datosPorTrabajo.complejidad, datosPorTrabajo.costosExtras);
   const total = (modo === 'horas' ? totalHoras : totalTrabajo) + calculoItemsExtra(items);
 
   // Convierte a 'String' y a moneda local el precio total.-
@@ -130,7 +146,7 @@ export const CrearPresupuesto = () => {
               datos={datosHoras}
               cambiarCampos={cambiarCamposHoras}
             />
-            : <CalculoPorTiempo
+            : <CalculoPorTrabajo
               datos={datosPorTrabajo}
               cambiarCampos={cambiarCamposPorTrabajo}
               cambiarComplejidad={cambiarComplejidad}
