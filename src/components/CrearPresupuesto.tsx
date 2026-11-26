@@ -38,20 +38,23 @@ export const CrearPresupuesto = () => {
   /* 
       ///////////////// ESTADOS /////////////////
   */
-  
+
   // Estado para el Formulario.-
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  
+
   // Estados para cambiar los Clientes.-
   const [clienteId, setClienteId] = useState<string | null>(null);
   const { clientes, setClientes } = useClientes();
+  const [mostrarSelector, setMostrarSelector] = useState(false);
+
+  const [tipoTrabajoId, setTipoTrabajoId] = useState<string | null>(null);
 
   // Estados para calcular el precio por hora.-
   const [datosHoras, setDatosHoras] = useState<DatosHoras>(DATOS_HORAS_VACIO);
 
   // Estados para calcular el precio por tipo de trabajo.-
   const [datosPorTrabajo, setDatosPorTrabajo] = useState<DatosPorTrabajo>(DATOS_POR_TRABAJO_VACIOS);
-  
+
   // Estado para que elegir el Modo (horas / trabajo).-
   const [modo, setModo] = useState<Modo>('horas');
 
@@ -90,7 +93,7 @@ export const CrearPresupuesto = () => {
   const cambiarComplejidad = (nuevaComplejidad: Complejidad) => {
     setDatosPorTrabajo((actuales) => ({ ...actuales, complejidad: nuevaComplejidad }));
   };
-  
+
   // Funciones para calcular el total del presupuesto.-
   const totalHoras = calculoPorHoras(datosHoras.tarifa, datosHoras.tiempoEstimado, datosHoras.costosExtras);
   const totalTrabajo = calculoPorTrabajo(datosPorTrabajo.precioBase, datosPorTrabajo.complejidad, datosPorTrabajo.costosExtras);
@@ -115,11 +118,14 @@ export const CrearPresupuesto = () => {
         {/* Cargar cliente.- */}
         <View style={globalStyles.card}>
           <Text style={globalStyles.label}>Cliente</Text>
-          <View style={globalStyles.inputField}>
+          <Pressable
+            onPress={() => setMostrarSelector(true)}
+            style={globalStyles.inputField}
+          >
             <Text style={globalStyles.body}>
               {clienteElegido ? clienteElegido.nombreApellido : 'Elegir el cliente del historial'}
             </Text>
-          </View>
+          </Pressable>
           <Pressable
             onPress={() => setMostrarFormulario(true)}
             hitSlop={8}
@@ -150,6 +156,8 @@ export const CrearPresupuesto = () => {
               datos={datosPorTrabajo}
               cambiarCampos={cambiarCamposPorTrabajo}
               cambiarComplejidad={cambiarComplejidad}
+              tipoTrabajoId={tipoTrabajoId}
+              setTipoTrabajoId={setTipoTrabajoId}
             />
           }
         </View>
@@ -212,6 +220,38 @@ export const CrearPresupuesto = () => {
           onGuardar={guardarCliente}
           onCancelar={() => setMostrarFormulario(false)}
         />
+      </Modal>
+
+      <Modal
+        visible={mostrarSelector}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setMostrarSelector(false)}
+      >
+        <Text style={globalStyles.sectionTitle}>Elegir Cliente</Text>
+        {clientes.length === 0 ? (
+          <Text style={globalStyles.body}>Todavía no hay clientes</Text>
+        ) : (
+          clientes.map((cliente) => (
+            <Pressable
+              key={cliente.id}
+              onPress={() => {
+                setClienteId(cliente.id);
+                setMostrarSelector(false);
+              }}
+            >
+              <Text style={globalStyles.body}>
+                {cliente.nombreApellido} - {cliente.empresa}
+              </Text>
+            </Pressable>
+          ))
+        )}
+        <Pressable
+          onPress={() => setMostrarSelector(false)}
+          style={globalStyles.pillButton}
+        >
+          <Text style={globalStyles.pillButtonText}>Cerrar</Text>
+        </Pressable>
       </Modal>
     </View>
   );
