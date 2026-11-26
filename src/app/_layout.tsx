@@ -1,4 +1,4 @@
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,7 +13,7 @@ const RootLayout = () => {
         <SafeAreaProvider>
           <StatusBar style="dark" />
           <SafeAreaView style={globalStyles.screen} edges={['top', 'left', 'right']}>
-            <Slot />
+            <Stack screenOptions={{ headerShown: false }}/>
           </SafeAreaView>
         </SafeAreaProvider>
       </TipoTrabajoProvider>

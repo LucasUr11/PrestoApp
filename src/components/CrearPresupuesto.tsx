@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { globalStyles } from '@/styles/globalStyles';
 
 import { useClientes } from '@/context/ClientesContext';
@@ -10,6 +10,7 @@ import { calculoPorTrabajo, CampoTexto, Complejidad, DatosPorTrabajo } from '@/u
 import { agregarCliente, crearCliente, DatosCliente } from '@/utils/clientes';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras, DatosHoras } from '@/utils/FuncionesPorHoras';
+import { useRouter } from 'expo-router';
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTrabajo } from './CalculoPorTrabajo';
 import { FormularioCliente } from './FormularioCliente';
@@ -34,6 +35,7 @@ const DATOS_POR_TRABAJO_VACIOS: DatosPorTrabajo = {
 
 
 export const CrearPresupuesto = () => {
+  const router = useRouter();
 
   /* 
       ///////////////// ESTADOS /////////////////
@@ -107,7 +109,7 @@ export const CrearPresupuesto = () => {
       <ScrollView
         automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[globalStyles.screenContent, styles.content]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -120,11 +122,15 @@ export const CrearPresupuesto = () => {
           <Text style={globalStyles.label}>Cliente</Text>
           <Pressable
             onPress={() => setMostrarSelector(true)}
-            style={globalStyles.inputField}
+            style={globalStyles.selectField}
           >
-            <Text style={globalStyles.body}>
-              {clienteElegido ? clienteElegido.nombreApellido : 'Elegir el cliente del historial'}
+            <Text
+              style={clienteElegido ? globalStyles.selectFieldText : globalStyles.selectFieldPlaceholder}
+              numberOfLines={1}
+            >
+              {clienteElegido ? clienteElegido.nombreApellido : 'Elegir cliente del historial'}
             </Text>
+            <Text style={globalStyles.muted}>▼</Text>
           </Pressable>
           <Pressable
             onPress={() => setMostrarFormulario(true)}
@@ -135,7 +141,8 @@ export const CrearPresupuesto = () => {
         </View>
 
         {/* Cálculos.- */}
-        <View style={globalStyles.inputField}>
+        <View style={globalStyles.section}>
+          <Text style={globalStyles.sectionTitle}>Tipo de cálculo</Text>
           <SegmentedControl
             options={[
               { value: 'horas', label: 'Por horas' },
@@ -145,8 +152,6 @@ export const CrearPresupuesto = () => {
             onChange={setModo}
           />
 
-        </View>
-        <View>
           {modo === 'horas'
             ? <CalculoPorHoras
               datos={datosHoras}
@@ -164,13 +169,13 @@ export const CrearPresupuesto = () => {
 
         {/* Notas Privadas.- */}
         <View style={globalStyles.section}>
-          <Text style={globalStyles.sectionTitle}>Notas Privadas</Text>
-          <View style={styles.field}>
+          <Text style={globalStyles.sectionTitle}>Notas privadas</Text>
+          <View style={globalStyles.field}>
             <TextInput
               value={notaPrivada}
               onChangeText={setNotaPrivada}
               placeholder="No irá en el presupuesto"
-              style={[globalStyles.inputField, styles.textInputMultiline]}
+              style={[globalStyles.textInput, globalStyles.textInputMultiline]}
               multiline={true}
               placeholderTextColor={Colors.placeholder}
             />
@@ -184,20 +189,28 @@ export const CrearPresupuesto = () => {
         />
 
         {/* Total + Botón de Generar PDF.- */}
-        <View style={styles.totalRow}>
-          <View style={styles.totalInfo}>
-            <Text style={globalStyles.muted}>Total estimado</Text>
-            <Text style={styles.totalAmount}>{aString}</Text>
+        <View style={styles.totalCard}>
+          <View style={styles.totalRow}>
+            <View style={styles.totalInfo}>
+              <Text style={styles.totalLabel}>Total estimado</Text>
+              <Text style={styles.totalAmount}>{aString}</Text>
+            </View>
+            <Pressable
+              onPress={() => router.push('/vista-previa')}
+              style={({ pressed }) => [
+                globalStyles.primaryButton,
+                pressed && globalStyles.primaryButtonPressed,
+              ]}
+            >
+              <Text style={globalStyles.primaryButtonText}>Generar PDF</Text>
+            </Pressable>
           </View>
-          <Pressable style={globalStyles.primaryButton}>
-            <Text style={globalStyles.primaryButtonText}>Generar PDF</Text>
-          </Pressable>
         </View>
       </ScrollView>
 
       <View style={styles.tabBar}>
         <Pressable style={styles.tabItem} hitSlop={8}>
-          <Text style={styles.tabIconActive}>○</Text>
+          <Text style={styles.tabIconActive}>●</Text>
           <Text style={styles.tabLabelActive}>Nuevo</Text>
         </Pressable>
         <Pressable style={styles.tabItem} hitSlop={8}>
@@ -210,6 +223,8 @@ export const CrearPresupuesto = () => {
         </Pressable>
       </View>
 
+
+      {/* MODALES.- */}
       <Modal
         visible={mostrarFormulario}
         animationType='slide'
@@ -228,30 +243,56 @@ export const CrearPresupuesto = () => {
         presentationStyle="pageSheet"
         onRequestClose={() => setMostrarSelector(false)}
       >
-        <Text style={globalStyles.sectionTitle}>Elegir Cliente</Text>
-        {clientes.length === 0 ? (
-          <Text style={globalStyles.body}>Todavía no hay clientes</Text>
-        ) : (
-          clientes.map((cliente) => (
-            <Pressable
-              key={cliente.id}
-              onPress={() => {
-                setClienteId(cliente.id);
-                setMostrarSelector(false);
-              }}
-            >
-              <Text style={globalStyles.body}>
-                {cliente.nombreApellido} - {cliente.empresa}
-              </Text>
-            </Pressable>
-          ))
-        )}
-        <Pressable
-          onPress={() => setMostrarSelector(false)}
-          style={globalStyles.pillButton}
-        >
-          <Text style={globalStyles.pillButtonText}>Cerrar</Text>
-        </Pressable>
+        <View style={globalStyles.modalScreen}>
+          <View style={globalStyles.modalHeader}>
+            <Text style={globalStyles.title}>Elegir cliente</Text>
+            <Text style={globalStyles.subtitle}>Seleccioná un cliente del historial</Text>
+          </View>
+
+          <ScrollView contentContainerStyle={globalStyles.modalContent} keyboardShouldPersistTaps="handled">
+            {clientes.length === 0 ? (
+              <View style={globalStyles.emptyState}>
+                <Text style={globalStyles.emptyStateTitle}>Todavía no hay clientes</Text>
+                <Text style={globalStyles.emptyStateText}>
+                  Creá un cliente nuevo para poder seleccionarlo en tus presupuestos.
+                </Text>
+              </View>
+            ) : (
+              <View style={globalStyles.section}>
+                {clientes.map((cliente) => {
+                  const selected = cliente.id === clienteId;
+                  return (
+                    <Pressable
+                      key={cliente.id}
+                      onPress={() => {
+                        setClienteId(cliente.id);
+                        setMostrarSelector(false);
+                      }}
+                      style={[globalStyles.listItem, selected && globalStyles.listItemActive]}
+                    >
+                      <View style={styles.listItemContent}>
+                        <Text style={globalStyles.listItemText}>{cliente.nombreApellido}</Text>
+                        {!!cliente.empresa && (
+                          <Text style={globalStyles.listItemMeta}>{cliente.empresa}</Text>
+                        )}
+                      </View>
+                      {selected && <Text style={styles.selectedMark}>✓</Text>}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+
+            <View style={globalStyles.modalActions}>
+              <Pressable
+                onPress={() => setMostrarSelector(false)}
+                style={globalStyles.secondaryButton}
+              >
+                <Text style={globalStyles.secondaryButtonText}>Cerrar</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </View>
       </Modal>
     </View>
   );
@@ -260,33 +301,52 @@ export const CrearPresupuesto = () => {
 const styles = StyleSheet.create({
   content: {
     gap: Spacing['2xl'],
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.lg,
     paddingBottom: Spacing['3xl'],
   },
   header: {
     gap: Spacing.xs,
+  },
+  totalCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.lg,
+    shadowColor: Colors.shadow,
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
   },
   totalRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Spacing.lg,
-    paddingTop: Spacing.sm,
   },
   totalInfo: {
     flex: 1,
     gap: Spacing.xs,
   },
+  totalLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
   totalAmount: {
     fontSize: FontSize['3xl'],
     fontWeight: FontWeight.bold,
     color: Colors.primary,
+    letterSpacing: -0.5,
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: Colors.divider,
     backgroundColor: Colors.surface,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.sm,
@@ -298,11 +358,11 @@ const styles = StyleSheet.create({
     minWidth: 72,
   },
   tabIcon: {
-    fontSize: FontSize.xl,
+    fontSize: FontSize.lg,
     color: Colors.textMuted,
   },
   tabIconActive: {
-    fontSize: FontSize.xl,
+    fontSize: FontSize.lg,
     color: Colors.primary,
   },
   tabLabel: {
@@ -315,10 +375,13 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
   },
-  textInputMultiline: {
-    minHeight: 100
+  listItemContent: {
+    flex: 1,
+    gap: 2,
   },
-  field: {
-    gap: Spacing.sm,
+  selectedMark: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
   },
 });

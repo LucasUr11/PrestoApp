@@ -1,18 +1,33 @@
 export const Colors = {
   primary: '#6E45F5',
+  primaryDark: '#5A36D6',
   primaryLight: '#EEE9FE',
+  primarySoft: '#F6F3FF',
 
-  background: '#FAFAFC',
+  background: '#F7F7FB',
   surface: '#FFFFFF',
   surfaceMuted: '#F2F2F7',
-  inputBackground: '#EDEDF5',
-  border: '#E4E4EC',
-  placeholder: '#2a2a2a53',
+  surfaceAlt: '#FBFBFD',
+
+  inputBackground: '#F3F4F8',
+  inputBackgroundFocused: '#FFFFFF',
+  border: '#E5E7EF',
+  borderStrong: '#D1D5E0',
+  divider: '#ECEEF4',
 
   textPrimary: '#17171F',
-  textSecondary: '#6B6D7C',
-  textMuted: '#9A9CA7',
+  textSecondary: '#5F6272',
+  textMuted: '#8C8FA1',
   textOnPrimary: '#FFFFFF',
+
+  danger: '#E5484D',
+  dangerLight: '#FFF1F2',
+  success: '#1A9B5C',
+  successLight: '#ECFDF3',
+
+  overlay: 'rgba(23, 23, 31, 0.45)',
+  placeholder: '#9A9CA7',
+  shadow: '#17171F',
 } as const;
 
 export const Spacing = {
@@ -26,9 +41,11 @@ export const Spacing = {
 } as const;
 
 export const Radius = {
+  xs: 6,
   sm: 8,
   md: 12,
   lg: 16,
+  xl: 20,
   pill: 999,
 } as const;
 
