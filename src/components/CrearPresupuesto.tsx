@@ -10,6 +10,7 @@ import { calculoPorTrabajo, CampoTexto, Complejidad, DatosPorTrabajo } from '@/u
 import { agregarCliente, crearCliente, DatosCliente } from '@/utils/clientes';
 import { convertirAString } from '@/utils/convertirAString';
 import { calculoPorHoras, DatosHoras } from '@/utils/FuncionesPorHoras';
+import { Modo } from '@/utils/presupuesto';
 import { useRouter } from 'expo-router';
 import { CalculoPorHoras } from './CalculoPorHoras';
 import { CalculoPorTrabajo } from './CalculoPorTrabajo';
@@ -17,7 +18,6 @@ import { FormularioCliente } from './FormularioCliente';
 import { ItemsExtra } from './ItemsExtra';
 import { SegmentedControl } from './SegmentedControl';
 
-type Modo = 'horas' | 'trabajo';
 
 const ITEMS_INICIALES: ItemExtra[] = [
   { id: '1', nombre: 'Revisiones', valor: '', activo: false, personalizado: false },
