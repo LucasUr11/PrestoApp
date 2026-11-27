@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { DocumentoPresupuesto } from '@/components/DocumentoPresupuesto';
+import { Spacing } from '@/constants/theme';
 import { usePresupuestos } from '@/context/PresupuestoContext';
 import { globalStyles } from '@/styles/globalStyles';
 
@@ -19,19 +20,40 @@ const VistaPreviaScreen = () => {
 
   return (
     <View style={globalStyles.screen}>
-      <Text style={globalStyles.title}>Vista previa</Text>
+      <ScrollView
+        contentContainerStyle={[globalStyles.screenContent, styles.content]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.barra}>
+          <Pressable
+            onPress={() => router.back()}
+            style={globalStyles.pillButton}
+          >
+            <Text style={globalStyles.pillButtonText}>‹ Editar</Text>
+          </Pressable>
+          <Text style={globalStyles.sectionTitle}>Presupuesto listo</Text>
+        </View>
 
-      {presupuesto ? (
-        <DocumentoPresupuesto presupuesto={presupuesto} />
-      ) : (
-        <Text style={globalStyles.body}>No se encontró el presupuesto</Text>
-      )}
-
-      <Pressable onPress={() => router.back()} style={globalStyles.pillButton}>
-        <Text style={globalStyles.pillButtonText}>Volver</Text>
-      </Pressable>
+        {/* Contenido del presupuesto.- */}
+        {presupuesto ? (
+          <DocumentoPresupuesto presupuesto={presupuesto} />
+        ) : (
+          <Text style={globalStyles.body}>No se encontró el presupuesto</Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
 
 export default VistaPreviaScreen;
+
+const styles = StyleSheet.create({
+  content: {
+    gap: Spacing.lg,
+  },
+  barra: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+  },
+});
