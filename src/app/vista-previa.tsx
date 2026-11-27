@@ -1,9 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
+import { DocumentoPresupuesto } from '@/components/DocumentoPresupuesto';
 import { usePresupuestos } from '@/context/PresupuestoContext';
 import { globalStyles } from '@/styles/globalStyles';
-import { convertirAString } from '@/utils/convertirAString';
 
 const VistaPreviaScreen = () => {
 
@@ -22,13 +22,7 @@ const VistaPreviaScreen = () => {
       <Text style={globalStyles.title}>Vista previa</Text>
 
       {presupuesto ? (
-        <>
-          <Text style={globalStyles.body}>
-            {presupuesto.cliente ? presupuesto.cliente.nombreApellido : 'Sin cliente'}
-          </Text>
-          <Text style={globalStyles.body}>{presupuesto.descripcion}</Text>
-          <Text style={globalStyles.body}>{convertirAString(presupuesto.total)}</Text>
-        </>
+        <DocumentoPresupuesto presupuesto={presupuesto} />
       ) : (
         <Text style={globalStyles.body}>No se encontró el presupuesto</Text>
       )}
