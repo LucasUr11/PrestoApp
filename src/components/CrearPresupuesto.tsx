@@ -18,6 +18,9 @@ import { FormularioCliente } from './FormularioCliente';
 import { ItemsExtra } from './ItemsExtra';
 import { SegmentedControl } from './SegmentedControl';
 
+import { usePresupuestos } from '@/context/PresupuestoContext';
+import { useTipoTrabajos } from '@/context/TipoTrabajoContext';
+import { agregarPresupuesto, armarPresupuesto } from '@/utils/presupuesto';
 
 const ITEMS_INICIALES: ItemExtra[] = [
   { id: '1', nombre: 'Revisiones', valor: '', activo: false, personalizado: false },
@@ -38,6 +41,14 @@ export const CrearPresupuesto = () => {
   const router = useRouter();
 
   /* 
+    ///////////////// CONTEXT /////////////////
+ */
+
+  const { clientes, setClientes } = useClientes();
+  const { setPresupuestos } = usePresupuestos();
+  const { tipoTrabajos } = useTipoTrabajos();
+
+  /* 
       ///////////////// ESTADOS /////////////////
   */
 
@@ -46,7 +57,6 @@ export const CrearPresupuesto = () => {
 
   // Estados para cambiar los Clientes.-
   const [clienteId, setClienteId] = useState<string | null>(null);
-  const { clientes, setClientes } = useClientes();
   const [mostrarSelector, setMostrarSelector] = useState(false);
 
   const [tipoTrabajoId, setTipoTrabajoId] = useState<string | null>(null);
@@ -103,6 +113,23 @@ export const CrearPresupuesto = () => {
 
   // Convierte a 'String' y a moneda local el precio total.-
   const aString: string = convertirAString(total);
+
+  // Generar el presupuesto.-
+  const generarPresupuesto = () => {
+    const tipoElegido = tipoTrabajos.find((t) => t.id === tipoTrabajoId);
+
+    const nuevo = armarPresupuesto({
+      cliente: clienteElegido ?? null, // '??' convierte el 'undefined' en 'null'.-
+      modo,
+      descripcion: modo === 'horas' ? 'Trabajo por horas' : (tipoElegido?.nombre ?? 'Trabajo por tipo'),
+      itemExtra: items,
+      total,
+      notaPrivada,
+    });
+
+    setPresupuestos((actuales) => agregarPresupuesto(actuales, nuevo));
+    router.push({ pathname: '/vista-previa', params: {id: nuevo.id}});
+  }
 
   return (
     <View style={globalStyles.screen}>
@@ -196,7 +223,7 @@ export const CrearPresupuesto = () => {
               <Text style={styles.totalAmount}>{aString}</Text>
             </View>
             <Pressable
-              onPress={() => router.push('/vista-previa')}
+              onPress={generarPresupuesto}
               style={({ pressed }) => [
                 globalStyles.primaryButton,
                 pressed && globalStyles.primaryButtonPressed,
